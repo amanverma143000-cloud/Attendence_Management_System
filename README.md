@@ -1,136 +1,286 @@
 # Attendance Management System (AMS)
 
-A full-stack MERN application for managing employee attendance with role-based access control, selfie punch-in/out, geolocation tracking, and an overtime approval workflow.
+A full-stack MERN (MongoDB, Express.js, React.js, Node.js) application for managing employee attendance with role-based access control, selfie-based punch-in/out, geolocation tracking, attendance validation, and overtime management.
 
 ---
 
-## Architecture Overview
+# Architecture Overview
 
+The application follows a client-server architecture.
+
+## Frontend (React + Vite)
+
+* React 18 for UI development
+* Redux Toolkit & RTK Query for state management and API communication
+* Tailwind CSS for styling
+* Protected routes based on user roles
+
+### Main Modules
+
+* Authentication
+* Employee Dashboard
+* Manager Dashboard
+* Admin Dashboard
+* Attendance Management
+* Overtime Management
+
+## Backend (Node.js + Express)
+
+* RESTful API architecture
+* JWT-based authentication
+* Role-Based Access Control (RBAC)
+* MongoDB database integration using Mongoose
+* Request validation using Zod
+* Logging using Winston and Morgan
+
+## Project Structure
+
+```text
+Attendance_Management_System/
+│
+├── client/
+│   ├── src/
+│   │   ├── app/
+│   │   ├── components/
+│   │   ├── features/
+│   │   ├── pages/
+│   │   └── routes/
+│   └── package.json
+│
+├── server/
+│   ├── src/
+│   │   ├── config/
+│   │   ├── controllers/
+│   │   ├── middleware/
+│   │   ├── models/
+│   │   ├── routes/
+│   │   └── utils/
+│   └── package.json
+│
+└── README.md
 ```
-Attendence_Management_System/
-├── client/                  # React + Vite frontend
-│   └── src/
-│       ├── app/             # Redux store + RTK Query apiSlice
-│       ├── features/        # auth / attendance / overtime API slices
-│       ├── components/      # Navbar, CameraCapture, StatusBadge
-│       ├── pages/           # Login, Register, Dashboard, Camera, OvertimeRequest
-│       │   ├── employee/
-│       │   ├── manager/
-│       │   └── admin/
-│       └── routes/          # ProtectedRoute, RoleRoute
-└── server/                  # Node.js + Express backend
-    └── src/
-        ├── config/          # MongoDB connection
-        ├── controllers/     # authController, attendanceController, overtimeController
-        ├── middleware/       # JWT auth, RBAC, Zod validation
-        ├── models/          # User, Attendance, Overtime
-        ├── routes/          # authRoutes, attendanceRoutes, overtimeRoutes
-        └── utils/           # Winston logger
-```
 
 ---
 
-## Features
+# Features Implemented
 
-- **Auth** — Register/Login with JWT, bcrypt password hashing
-- **RBAC** — Employee, Manager, Admin roles with protected routes
-- **Punch In/Out** — Webcam selfie capture (base64), geolocation, timestamp
-- **Attendance Status** — Auto-computed: `Completed` (≥8h), `Incomplete` (<8h)
-- **Validation** — Managers mark attendance Valid/Invalid with remarks
-- **Overtime** — Employees request overtime; Managers Approve/Reject
-- **Dashboards** — Role-specific views with color-coded status badges
-- **Logging** — Winston + Morgan for structured HTTP and app logs
+## Authentication & Authorization
+
+* User Registration
+* User Login
+* JWT Authentication
+* Password Hashing using bcrypt
+* Role-Based Access Control (Employee, Manager, Admin)
+
+## Attendance Management
+
+* Selfie-based Punch In
+* Selfie-based Punch Out
+* Timestamp Recording
+* Employee Attendance History
+* Automatic Working Hours Calculation
+
+## Attendance Validation
+
+* Manager/Admin Validation
+* Valid / Invalid Status
+* Remarks Support
+
+## Overtime Management
+
+* Employee Overtime Requests
+* Manager/Admin Approval Workflow
+* Approve / Reject Actions
+* Overtime Request Tracking
+
+## Dashboards
+
+### Employee Dashboard
+
+* Punch In/Out
+* View Attendance
+* Submit Overtime Requests
+
+### Manager Dashboard
+
+* Review Attendance Records
+* Validate Attendance
+* Review Overtime Requests
+
+### Admin Dashboard
+
+* Complete System Access
+* Attendance Monitoring
+* User Management Features
+
+## Additional Features
+
+* Geolocation Capture
+* Webcam Selfie Capture
+* Protected Routes
+* Structured Logging
+* Responsive User Interface
 
 ---
 
-## Tech Stack
+# Setup Instructions
 
-| Layer     | Technologies                                              |
-|-----------|-----------------------------------------------------------|
-| Frontend  | React 18, Vite, Tailwind CSS, Redux Toolkit, RTK Query    |
-| Backend   | Node.js, Express.js, Mongoose, Winston, Morgan            |
-| Auth      | JSON Web Tokens, bcryptjs                                 |
-| Validation| Zod (server-side schema validation)                       |
-| Database  | MongoDB                                                   |
+## Prerequisites
+
+* Node.js (v18 or above)
+* MongoDB Atlas Account or Local MongoDB
+* Git
 
 ---
 
-## Setup Instructions
-
-### Prerequisites
-- Node.js >= 18
-- MongoDB running locally or a MongoDB Atlas URI
-
-### 1. Clone & Install
+## Clone Repository
 
 ```bash
-# Install server dependencies
+git clone <repository-url>
+cd Attendance_Management_System
+```
+
+---
+
+## Backend Setup
+
+```bash
 cd server
 npm install
-
-# Install client dependencies
-cd ../client
-npm install
 ```
 
-### 2. Configure Environment
+Create a `.env` file inside the server folder:
 
-```bash
-# Copy the example env and fill in your values
-cp .env.example server/.env
-```
-
-Edit `server/.env`:
-```
+```env
 PORT=5000
-MONGO_URI=mongodb://localhost:27017/attendance_db
-JWT_SECRET=replace_with_strong_secret
+MONGO_URI=mongodb_connection_string
+JWT_SECRET=jwt_key
 NODE_ENV=development
 ```
 
-### 3. Run the Application
+Run Backend:
 
 ```bash
-# Terminal 1 — Start backend
-cd server
-npm run dev
-
-# Terminal 2 — Start frontend
-cd client
 npm run dev
 ```
 
-- Frontend: http://localhost:3000
-- Backend API: http://localhost:5000/api
+Backend will run at:
+
+```text
+http://localhost:5000
+```
 
 ---
 
-## API Endpoints
+## Frontend Setup
 
-| Method | Endpoint                        | Access           | Description                  |
-|--------|---------------------------------|------------------|------------------------------|
-| POST   | /api/auth/register              | Public           | Register new user            |
-| POST   | /api/auth/login                 | Public           | Login, returns JWT           |
-| GET    | /api/auth/me                    | Protected        | Get current user             |
-| POST   | /api/attendance/punch-in        | Employee+        | Punch in with selfie         |
-| POST   | /api/attendance/punch-out       | Employee+        | Punch out with selfie        |
-| GET    | /api/attendance/today           | Employee+        | Today's attendance record    |
-| GET    | /api/attendance/my              | Employee+        | Last 30 days records         |
-| GET    | /api/attendance/all             | Manager, Admin   | All employees' attendance    |
-| PATCH  | /api/attendance/:id/validate    | Manager, Admin   | Validate attendance record   |
-| POST   | /api/overtime                   | Employee+        | Request overtime             |
-| GET    | /api/overtime/my                | Employee+        | Own overtime requests        |
-| GET    | /api/overtime/all               | Manager, Admin   | All overtime requests        |
-| PATCH  | /api/overtime/:id/review        | Manager, Admin   | Approve/Reject overtime      |
+```bash
+cd client
+npm install
+npm run dev
+```
+
+Frontend will run at:
+
+```text
+http://localhost:3000
+```
 
 ---
 
-## Assumptions
+## Production Deployment
 
-1. One attendance record is allowed per employee per calendar day.
-2. Punch-out is not allowed without a prior punch-in on the same day.
-3. Total hours are computed server-side as `(punchOut - punchIn)` in hours.
-4. Selfie images are stored as base64 strings directly in MongoDB (suitable for development; use S3/object storage in production).
-5. Geolocation is optional — if the browser denies permission, location is stored as `null`.
-6. JWT tokens expire after 7 days.
-7. The `Admin` role has all Manager capabilities plus the full admin dashboard view.
+### Frontend
+
+Deployed on Vercel.
+
+### Backend
+
+Deployed on Render.
+
+### Database
+
+Hosted on MongoDB Atlas.
+
+---
+
+# API Endpoints
+
+## Authentication
+
+* POST /api/auth/register
+* POST /api/auth/login
+* GET /api/auth/me
+
+## Attendance
+
+* POST /api/attendance/punch-in
+* POST /api/attendance/punch-out
+* GET /api/attendance/today
+* GET /api/attendance/my
+* GET /api/attendance/all
+* PATCH /api/attendance/:id/validate
+
+## Overtime
+
+* POST /api/overtime
+* GET /api/overtime/my
+* GET /api/overtime/all
+* PATCH /api/overtime/:id/review
+
+---
+
+# Assumptions Made
+
+1. A user can create only one attendance record per day.
+
+2. Punch-out is allowed only after a successful punch-in.
+
+3. Attendance status is calculated automatically based on total working hours.
+
+4. Working hours greater than or equal to 8 hours are marked as Completed.
+
+5. Working hours less than 8 hours are marked as Incomplete.
+
+6. Selfie images are stored directly in MongoDB as Base64 strings for simplicity.
+
+7. Geolocation information is optional and depends on browser permission.
+
+8. JWT tokens remain valid for 7 days.
+
+9. Managers can validate attendance and review overtime requests.
+
+10. Admin users have complete access to all management features.
+
+---
+
+# Tech Stack
+
+## Frontend
+
+* React.js
+* Vite
+* Tailwind CSS
+* Redux Toolkit
+* RTK Query
+
+## Backend
+
+* Node.js
+* Express.js
+* MongoDB
+* Mongoose
+
+## Authentication
+
+* JWT
+* bcryptjs
+
+## Validation
+
+* Zod
+
+## Logging
+
+* Winston
+* Morgan
